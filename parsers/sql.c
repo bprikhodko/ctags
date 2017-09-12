@@ -51,7 +51,7 @@
 	 * isIdentChar1 is used to identify the first character of an
 	 * identifier, so we are removing some restrictions.
 	 */ \
-	(isalpha (c) || (c) == '@' || (c) == '_' )
+	(isalpha (c) || (c) == '@' || (c) == '_' || (c) == '$')
 #define isIdentChar(c) \
 	(isalpha (c) || isdigit (c) || (c) == '$' || \
 		(c) == '@' || (c) == '_' || (c) == '#')
@@ -86,6 +86,7 @@ enum eKeywordId {
 	KEYWORD_package,
 	KEYWORD_pragma,
 	KEYWORD_procedure,
+	KEYWORD_prompt,
 	KEYWORD_record,
 	KEYWORD_object,
 	KEYWORD_ref,
@@ -262,6 +263,7 @@ static const keywordTable SqlKeywordTable [] = {
 	{ "package",						KEYWORD_package			      },
 	{ "pragma",							KEYWORD_pragma			      },
 	{ "procedure",						KEYWORD_procedure		      },
+	{ "prompt",							KEYWORD_prompt 		      	  },
 	{ "record",							KEYWORD_record			      },
 	{ "object",							KEYWORD_object			      },
 	{ "ref",							KEYWORD_ref				      },
@@ -675,11 +677,11 @@ getNextChar:
 					  break;
 				  }
 
-		case '$':
-				  token->type = parseDollarQuote (token->string, c);
-				  token->lineNumber = getInputLineNumber ();
-				  token->filePosition = getInputFilePosition ();
-				  break;
+		// case '$':
+		// 		  token->type = parseDollarQuote (token->string, c);
+		// 		  token->lineNumber = getInputLineNumber ();
+		// 		  token->filePosition = getInputFilePosition ();
+		// 		  break;
 
 		default:
 				  if (! isIdentChar1 (c))
@@ -690,7 +692,7 @@ getNextChar:
 					  token->lineNumber = getInputLineNumber ();
 					  token->filePosition = getInputFilePosition ();
 					  token->keyword = lookupCaseKeyword (vStringValue (token->string), Lang_sql);
-					  if (isKeyword (token, KEYWORD_rem))
+					  if (isKeyword (token, KEYWORD_rem) || isKeyword (token, KEYWORD_prompt) )
 					  {
 						  vStringClear (token->string);
 						  skipToCharacterInInputFile ('\n');
